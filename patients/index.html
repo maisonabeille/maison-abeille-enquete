@@ -344,19 +344,20 @@ const npsGrid=document.getElementById('nps-grid');
 for(let i=0;i<=10;i++){const btn=document.createElement('button');btn.type='button';btn.className='nps-btn';btn.textContent=i;btn.onclick=()=>{npsScore=i;document.querySelectorAll('.nps-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');};npsGrid.appendChild(btn);}
 function updateProgress(s){const n=parseInt(s);document.getElementById('progress-fill').style.width=(isNaN(n)?0:Math.min(100,Math.round(n/TOTAL_Q*100)))+'%';}
 function goTo(s){document.querySelectorAll('.step').forEach(x=>x.classList.remove('active'));const el=document.querySelector('[data-step="'+s+'"]');if(el)el.classList.add('active');updateProgress(s);window.scrollTo(0,0);syncSelected();}
-function syncSelected(){document.querySelectorAll('.option-label').forEach(l=>{const i=l.querySelector('input[type=radio]');if(i)l.classList.toggle('selected',i.checked);});}
+function syncSelected(){document.querySelectorAll('.option-label').forEach(l=>{const i=l.querySelector('input');if(i)l.classList.toggle('selected',i.checked);});}
 document.addEventListener('click',e=>{
   const l=e.target.closest('.option-label');if(!l)return;
-  const i=l.querySelector('input');if(!i)return;
-  if(i.type==='radio'){
-    document.querySelectorAll('input[name="'+i.name+'"]').forEach(r=>r.closest('.option-label')?.classList.remove('selected'));
-    l.classList.add('selected');
-  }else if(i.type==='checkbox'){
-    const list=l.closest('.options-list');
-    const max=list?parseInt(list.dataset.max||'99'):99;
-    if(l.classList.contains('selected')){l.classList.remove('selected');}
-    else{const sc=list?list.querySelectorAll('.option-label.selected').length:0;if(sc<max)l.classList.add('selected');}
-  }
+  const i=l.querySelector('input');if(!i||i.type!=='radio')return;
+  document.querySelectorAll('input[name="'+i.name+'"]').forEach(r=>r.closest('.option-label')?.classList.remove('selected'));
+  l.classList.add('selected');
+});
+document.addEventListener('change',e=>{
+  const i=e.target;if(i.type!=='checkbox')return;
+  const l=i.closest('.option-label');if(!l)return;
+  const list=l.closest('.options-list');
+  const max=list?parseInt(list.dataset.max||'99'):99;
+  if(i.checked){const sc=list?list.querySelectorAll('.option-label.selected').length:0;if(sc>=max){i.checked=false;return;}l.classList.add('selected');}
+  else{l.classList.remove('selected');}
 });
 function nextStep(f,n,t){const c=document.querySelector('input[name="'+n+'"]:checked');if(!c){const w=document.querySelector('[data-step="'+f+'"] .options-list');if(w){w.classList.add('shake');setTimeout(()=>w.classList.remove('shake'),400);}return;}goTo(t);}
 function nextStepCheck(f,n,t,max){const checked=document.querySelectorAll('[data-step="'+f+'"] input[name="'+n+'"]:checked');if(!checked.length){const w=document.querySelector('[data-step="'+f+'"] .options-list');if(w){w.classList.add('shake');setTimeout(()=>w.classList.remove('shake'),400);}return;}if(max&&checked.length>max)return;goTo(t);}
