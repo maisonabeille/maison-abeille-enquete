@@ -27,12 +27,12 @@
     .options-list li{margin-bottom:9px;}
     .option-label{display:flex;align-items:center;padding:13px 16px;background:white;border:1.5px solid #E8E0D0;border-radius:10px;cursor:pointer;transition:border-color .2s,background .2s;font-size:.88rem;color:var(--ink);min-height:48px;user-select:none;}
     .option-label:hover{border-color:var(--gold);background:#FFFAF4;}
-    .option-label input[type=radio],.option-label input[type=checkbox]{display:none;}
+    .option-label input[type=radio],.option-label input[type=checkbox]{position:absolute;opacity:0;width:0;height:0;margin:0;}
     .radio-dot{width:18px;height:18px;flex-shrink:0;border:2px solid #D5C9B5;border-radius:50%;margin-right:12px;background:white;transition:border-color .2s,background .2s;position:relative;}
     .radio-dot::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);width:8px;height:8px;background:white;border-radius:50%;transition:transform .2s;}
-    .option-label.selected{border-color:var(--gold);}
-    .option-label.selected .radio-dot{background:var(--gold);border-color:var(--gold);}
-    .option-label.selected .radio-dot::after{transform:translate(-50%,-50%) scale(1);}
+    .option-label:has(input:checked),.option-label.selected{border-color:var(--gold);}
+    .option-label:has(input:checked) .radio-dot,.option-label.selected .radio-dot{background:var(--gold);border-color:var(--gold);}
+    .option-label:has(input:checked) .radio-dot::after,.option-label.selected .radio-dot::after{transform:translate(-50%,-50%) scale(1);}
     .matrix-wrap{overflow-x:auto;}
     .matrix{width:100%;border-collapse:collapse;}
     .matrix thead th{padding:8px 10px;font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);text-align:center;}
@@ -74,7 +74,6 @@
     .sm-stars{display:flex;gap:5px;flex-shrink:0;}
     .sm-star{font-size:1.65rem;color:#D4C8B0;cursor:pointer;transition:color .12s;user-select:none;}
     .sm-star.sm-lit{color:var(--gold);}
-    .option-label.selected .radio-dot{background:var(--gold);border-color:var(--gold);}
     .option-label input[type=checkbox] ~ .radio-dot{border-radius:4px;}
   </style>
 </head>
@@ -344,19 +343,15 @@ const npsGrid=document.getElementById('nps-grid');
 for(let i=0;i<=10;i++){const btn=document.createElement('button');btn.type='button';btn.className='nps-btn';btn.textContent=i;btn.onclick=()=>{npsScore=i;document.querySelectorAll('.nps-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');};npsGrid.appendChild(btn);}
 function updateProgress(s){const n=parseInt(s);document.getElementById('progress-fill').style.width=(isNaN(n)?0:Math.min(100,Math.round(n/TOTAL_Q*100)))+'%';}
 function goTo(s){document.querySelectorAll('.step').forEach(x=>x.classList.remove('active'));const el=document.querySelector('[data-step="'+s+'"]');if(el)el.classList.add('active');updateProgress(s);window.scrollTo(0,0);syncSelected();}
-function syncSelected(){document.querySelectorAll('.option-label').forEach(l=>{const i=l.querySelector('input');if(i)l.classList.toggle('selected',i.checked);});}
-document.addEventListener('click',e=>{
-  const l=e.target.closest('.option-label');if(!l)return;
-  const i=l.querySelector('input');if(!i)return;
-  if(i.type==='radio'){
-    document.querySelectorAll('input[name="'+i.name+'"]').forEach(r=>r.closest('.option-label')?.classList.remove('selected'));
-    l.classList.add('selected');
-  }else if(i.type==='checkbox'){
-    e.preventDefault();
-    const list=l.closest('.options-list');
-    const max=list?parseInt(list.dataset.max||'99'):99;
-    if(i.checked){i.checked=false;l.classList.remove('selected');}
-    else{const sc=list?list.querySelectorAll('.option-label.selected').length:0;if(sc<max){i.checked=true;l.classList.add('selected');}}
+function syncSelected(){}
+document.addEventListener('change',e=>{
+  const i=e.target;
+  if(i.type==='checkbox'&&i.checked){
+    const list=i.closest('.options-list');
+    if(!list)return;
+    const max=parseInt(list.dataset.max||'99');
+    const sc=list.querySelectorAll('input[type=checkbox]:checked').length;
+    if(sc>max)i.checked=false;
   }
 });
 function nextStep(f,n,t){const c=document.querySelector('input[name="'+n+'"]:checked');if(!c){const w=document.querySelector('[data-step="'+f+'"] .options-list');if(w){w.classList.add('shake');setTimeout(()=>w.classList.remove('shake'),400);}return;}goTo(t);}
