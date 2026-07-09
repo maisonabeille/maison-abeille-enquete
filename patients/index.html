@@ -222,17 +222,19 @@
 
   <div class="step" data-step="10"><div class="step-q">
     <div class="q-number">Question 10 · 12</div>
-    <h2>Quels soins ou expériences vous intéresseraient à l'avenir ?</h2>
+    <h2>Y a-t-il un soin ou service que vous aimeriez trouver ici à l'avenir ?</h2>
     <p class="q-hint">Optionnel — plusieurs réponses possibles</p>
     <ul class="options-list">
-      <li><label class="option-label"><input type="checkbox" name="q10" value="Dermoscopie"><span class="radio-dot"></span>Dépistage cutané / dermoscopie</label></li>
-      <li><label class="option-label"><input type="checkbox" name="q10" value="FotoFinder"><span class="radio-dot"></span>Suivi des grains de beauté (FotoFinder)</label></li>
-      <li><label class="option-label"><input type="checkbox" name="q10" value="Chirurgie"><span class="radio-dot"></span>Chirurgie dermatologique</label></li>
-      <li><label class="option-label"><input type="checkbox" name="q10" value="Esthetique"><span class="radio-dot"></span>Médecine esthétique (laser, peeling…)</label></li>
-      <li><label class="option-label"><input type="checkbox" name="q10" value="Botox fillers"><span class="radio-dot"></span>Botox / fillers</label></li>
-      <li><label class="option-label"><input type="checkbox" name="q10" value="Nutrition"><span class="radio-dot"></span>Consultation nutrition / dermatologie interne</label></li>
-      <li><label class="option-label"><input type="checkbox" name="q10" value="Autre"><span class="radio-dot"></span>Autre</label></li>
+      <li><label class="option-label"><input type="checkbox" name="q10" value="Nutrition"><span class="radio-dot"></span>Consultation nutrition &amp; dermatologie interne</label></li>
+      <li><label class="option-label"><input type="checkbox" name="q10" value="Pediatrique"><span class="radio-dot"></span>Dermatologie pédiatrique</label></li>
+      <li><label class="option-label"><input type="checkbox" name="q10" value="Teleconsultation"><span class="radio-dot"></span>Téléconsultation (suivi à distance)</label></li>
+      <li><label class="option-label"><input type="checkbox" name="q10" value="Bilan peau"><span class="radio-dot"></span>Bilan de peau personnalisé (prévention annuelle)</label></li>
+      <li><label class="option-label"><input type="checkbox" name="q10" value="Acne"><span class="radio-dot"></span>Programme de suivi acné (consultations dédiées)</label></li>
+      <li><label class="option-label"><input type="checkbox" name="q10" value="Autre" onchange="toggleCond('cond-q10-autre',this.checked)"><span class="radio-dot"></span>Autre</label></li>
     </ul>
+    <div class="conditional" id="cond-q10-autre">
+      <textarea name="q10_autre" placeholder="Précisez le soin ou service souhaité…"></textarea>
+    </div>
   </div><nav class="btn-nav"><button class="btn-back" onclick="backQ10()">←</button><button class="btn-next" onclick="goTo(12)">Suivant →</button></nav></div>
 
   
@@ -357,7 +359,7 @@ document.addEventListener('change',e=>{
 function nextStep(f,n,t){const c=document.querySelector('input[name="'+n+'"]:checked');if(!c){const w=document.querySelector('[data-step="'+f+'"] .options-list');if(w){w.classList.add('shake');setTimeout(()=>w.classList.remove('shake'),400);}return;}goTo(t);}
 function nextStepCheck(f,n,t,max){const checked=document.querySelectorAll('[data-step="'+f+'"] input[name="'+n+'"]:checked');if(!checked.length){const w=document.querySelector('[data-step="'+f+'"] .options-list');if(w){w.classList.add('shake');setTimeout(()=>w.classList.remove('shake'),400);}return;}if(max&&checked.length>max)return;goTo(t);}
 function toggleCond(id,show){const el=document.getElementById(id);if(el)el.classList.toggle('show',show);}
-function collectData(){const d={submitted_at:new Date().toISOString()};if(surveyBranch==='pre')d.branch='pre_consultation';['q3a','q3b','q3c','q3d','q4','q5','q7','q8','q8b','q9'].forEach(n=>{const v=document.querySelector('input[name="'+n+'"]:checked');if(v)d[n]=v.value;});Object.entries(smRatings).forEach(([k,v])=>{if(v>0)d[k]=v;});['q1','q2','q6','q10'].forEach(n=>{const vals=Array.from(document.querySelectorAll('input[name="'+n+'"]:checked')).map(i=>i.value);if(vals.length)d[n]=vals.join(', ');});['q4_detail','q12_why'].forEach(n=>{const el=document.querySelector('textarea[name="'+n+'"]');if(el&&el.value.trim())d[n]=el.value.trim();});if(npsScore!==null)d['q12_nps']=npsScore;return d;}
+function collectData(){const d={submitted_at:new Date().toISOString()};if(surveyBranch==='pre')d.branch='pre_consultation';['q3a','q3b','q3c','q3d','q4','q5','q7','q8','q8b','q9'].forEach(n=>{const v=document.querySelector('input[name="'+n+'"]:checked');if(v)d[n]=v.value;});Object.entries(smRatings).forEach(([k,v])=>{if(v>0)d[k]=v;});['q1','q2','q6','q10'].forEach(n=>{const vals=Array.from(document.querySelectorAll('input[name="'+n+'"]:checked')).map(i=>i.value);if(vals.length)d[n]=vals.join(', ');});['q4_detail','q12_why','q10_autre'].forEach(n=>{const el=document.querySelector('textarea[name="'+n+'"]');if(el&&el.value.trim())d[n]=el.value.trim();});if(npsScore!==null)d['q12_nps']=npsScore;return d;}
 async function submitForm(){
   if(npsScore===null){const g=document.getElementById('nps-grid');g.classList.add('shake');setTimeout(()=>g.classList.remove('shake'),400);return;}
   const why=document.getElementById('q12-why');if(!why.value.trim()){why.style.borderColor='#C0392B';setTimeout(()=>why.style.borderColor='',2000);why.focus();return;}
