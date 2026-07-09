@@ -365,11 +365,13 @@ function createKPIDashboard() {
   // ── Masquer la grille de fond ──
   // (non disponible en Apps Script — cosmétique seulement)
 
+  var allSheets = ss.getSheets();
+  var sheetNames = allSheets.map(function(s){ return s.getName(); }).join(', ');
   SpreadsheetApp.getUi().alert(
     '✅  Tableau KPI créé !\n\n' +
+    'Onglets présents dans ce fichier : ' + sheetNames + '\n\n' +
     '• Les lignes "Enquête – auto" se calculent automatiquement.\n' +
     '• Pour les autres lignes : saisir la valeur dans "Valeur actuelle",\n' +
-    '  puis choisir Tendance et Statut via les listes déroulantes.\n\n' +
-    'Pour actualiser le script : Extensions > Apps Script > ▶ Exécuter.'
+    '  puis choisir Tendance et Statut via les listes déroulantes.'
   );
 }
