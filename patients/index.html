@@ -347,17 +347,17 @@ function goTo(s){document.querySelectorAll('.step').forEach(x=>x.classList.remov
 function syncSelected(){document.querySelectorAll('.option-label').forEach(l=>{const i=l.querySelector('input');if(i)l.classList.toggle('selected',i.checked);});}
 document.addEventListener('click',e=>{
   const l=e.target.closest('.option-label');if(!l)return;
-  const i=l.querySelector('input');if(!i||i.type!=='radio')return;
-  document.querySelectorAll('input[name="'+i.name+'"]').forEach(r=>r.closest('.option-label')?.classList.remove('selected'));
-  l.classList.add('selected');
-});
-document.addEventListener('change',e=>{
-  const i=e.target;if(i.type!=='checkbox')return;
-  const l=i.closest('.option-label');if(!l)return;
-  const list=l.closest('.options-list');
-  const max=list?parseInt(list.dataset.max||'99'):99;
-  if(i.checked){const sc=list?list.querySelectorAll('.option-label.selected').length:0;if(sc>=max){i.checked=false;return;}l.classList.add('selected');}
-  else{l.classList.remove('selected');}
+  const i=l.querySelector('input');if(!i)return;
+  if(i.type==='radio'){
+    document.querySelectorAll('input[name="'+i.name+'"]').forEach(r=>r.closest('.option-label')?.classList.remove('selected'));
+    l.classList.add('selected');
+  }else if(i.type==='checkbox'){
+    e.preventDefault();
+    const list=l.closest('.options-list');
+    const max=list?parseInt(list.dataset.max||'99'):99;
+    if(i.checked){i.checked=false;l.classList.remove('selected');}
+    else{const sc=list?list.querySelectorAll('.option-label.selected').length:0;if(sc<max){i.checked=true;l.classList.add('selected');}}
+  }
 });
 function nextStep(f,n,t){const c=document.querySelector('input[name="'+n+'"]:checked');if(!c){const w=document.querySelector('[data-step="'+f+'"] .options-list');if(w){w.classList.add('shake');setTimeout(()=>w.classList.remove('shake'),400);}return;}goTo(t);}
 function nextStepCheck(f,n,t,max){const checked=document.querySelectorAll('[data-step="'+f+'"] input[name="'+n+'"]:checked');if(!checked.length){const w=document.querySelector('[data-step="'+f+'"] .options-list');if(w){w.classList.add('shake');setTimeout(()=>w.classList.remove('shake'),400);}return;}if(max&&checked.length>max)return;goTo(t);}
