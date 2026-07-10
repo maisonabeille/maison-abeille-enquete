@@ -180,6 +180,8 @@ async function loadData(){
     const res=await fetch(url);const text=await res.text();
     const json=JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
     const colMap={};json.table.cols.forEach((c,i)=>{if(c.label)colMap[c.label]=i;});
+    const _alias={'q1':'Decouverte','q2':'Pourquoi nous','q3a':'RDV: Trouver creneau (1-5)','q3b':'RDV: Motif (1-5)','q3c':'RDV: Joindre cabinet (1-5)','q3d':'RDV: Delai obtention (1-5)','q4':'Site web','q4_detail':'Site web (detail)','q5':'Tarifs','q6':'Canal communication','q7':'Questions medecin','q8':'Attente en salle','q8b':'Informe pendant attente','q9':'Instructions post-consultation','q10':'Services souhaites','q10_autre':'Services autre','q12_nps':'NPS (0-10)','q12_why':'Pourquoi NPS'};
+    Object.entries(_alias).forEach(([field,label])=>{if(colMap[field]===undefined&&colMap[label]!==undefined)colMap[field]=colMap[label];});
     const allRows=json.table.rows;
     const rows=allRows.filter(r=>{const v=r.c&&r.c[0]&&r.c[0].v;return v&&v!=='submitted_at'&&v!=='Date';});
     if(rows.length===0){document.getElementById('loading').innerHTML='<p style="color:#888;font-size:.85rem">Aucune réponse pour le moment.</p>';return;}
